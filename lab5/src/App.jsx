@@ -1,21 +1,24 @@
 import { useState } from "react";
 import "./App.css";
 import initialColors from "../colors.json";
+import Gallery from "./Gallery";
 
+const defaultColor = "rgb(240, 240, 240)";
+const divArr = new Array(400).fill(defaultColor);
 function App() {
-  const defaultColor = "rgb(240, 240, 240)";
-  const divArr = new Array(400).fill(defaultColor);
-
-  const [count, setCount] = useState(0);
-  const [colors, setColors] = useState(initialColors);
-  const [selectedId, setSelectedId] = useState(initialColors[0].id);
-  const [selectedColor, setSelectedColor] = useState(initialColors[0].color);
+  // const [selectedId, setSelectedId] = useState(initialColors[0].id);
+  const [selectedColor, setSelectedColor] = useState({
+    id: initialColors[0].id,
+    color: initialColors[0].color,
+  });
   const [cellColors, setCellColors] = useState(divArr);
   const [savedDrawings, setSavedDrawings] = useState([]);
 
+  const count = savedDrawings.length;
+
   function changeColor(cellId) {
     const newCellColors = [...cellColors];
-    newCellColors[cellId] = selectedColor;
+    newCellColors[cellId] = selectedColor.color;
     setCellColors(newCellColors);
   }
 
@@ -25,70 +28,23 @@ function App() {
 
   function save() {
     setSavedDrawings([...savedDrawings, [...cellColors]]);
-    setCount(count + 1);
   }
 
-  function generateGallery() {
-    return (
-      <>
-        <div className="gallery">
-          <h2>Saved Drawings ({savedDrawings.length})</h2>
-          {savedDrawings.map((drawing, index) => (
-            <div key={index} className="gallery-item">
-              <div className="gallery-thumbnail">
-                {drawing.map((cellColor, id) => {
-                  return (
-                    <div
-                      key={id}
-                      className="grid-cell"
-                      style={{ backgroundColor: cellColor }}
-                    ></div>
-                  );
-                })}
-              </div>
-              <div>
-                <button
-                  onClick={() => {
-                    setCellColors([...drawing]);
-                  }}
-                >
-                  Load
-                </button>
-                <button
-                  onClick={() => {
-                    const newDrawings = savedDrawings.filter(
-                      (_, i) => i !== index,
-                    );
-                    setSavedDrawings(newDrawings);
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </>
-    );
-  }
   return (
     <>
       <div className="color-palette">
-        {colors.map((ObjColor, id) => {
+        {initialColors.map((ObjColor) => {
           return (
             <button
+              className="obj-color"
               key={ObjColor.id}
               style={{
                 backgroundColor: ObjColor.color,
-                width: "50px",
-                height: "50px",
-                borderRadius: "50px",
-                marginRight: "5px",
-                border: selectedId === ObjColor.id ? "2px solid black" : "none",
+                border:
+                  selectedColor.id === ObjColor.id ? "2px solid black" : "none",
               }}
               onClick={() => {
-                setSelectedId(ObjColor.id);
-                setSelectedColor(ObjColor.color);
+                setSelectedColor({ ...ObjColor });
               }}
             ></button>
           );
@@ -110,7 +66,11 @@ function App() {
         <button onClick={save}>Save</button>
         <button onClick={reset}>Reset</button>
       </div>
-      {generateGallery()}
+      <Gallery
+        savedDrawings={savedDrawings}
+        onSaveDrawings={setSavedDrawings}
+        onChangeCellColors={setCellColors}
+      />
     </>
   );
 }
