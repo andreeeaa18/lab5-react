@@ -13,8 +13,7 @@ function App() {
   });
   const [cellColors, setCellColors] = useState(divArr);
   const [savedDrawings, setSavedDrawings] = useState([]);
-
-  const count = savedDrawings.length;
+  const [isClicked, setIsClicked] = useState(false);
 
   function changeColor(cellId) {
     const newCellColors = [...cellColors];
@@ -33,18 +32,18 @@ function App() {
   return (
     <>
       <div className="color-palette">
-        {initialColors.map((ObjColor) => {
+        {initialColors.map((objColor) => {
           return (
             <button
               className="obj-color"
-              key={ObjColor.id}
+              key={objColor.id}
               style={{
-                backgroundColor: ObjColor.color,
+                backgroundColor: objColor.color,
                 border:
-                  selectedColor.id === ObjColor.id ? "2px solid black" : "none",
+                  selectedColor.id === objColor.id ? "2px solid black" : "none",
               }}
               onClick={() => {
-                setSelectedColor({ ...ObjColor });
+                setSelectedColor({ ...objColor });
               }}
             ></button>
           );
@@ -58,6 +57,16 @@ function App() {
               className="grid-cell"
               style={{ backgroundColor: cellColor }}
               onClick={() => changeColor(id)}
+              onMouseDown={() => {
+                changeColor(id);
+                setIsClicked(true);
+              }}
+              onMouseEnter={() => {
+                if (isClicked) {
+                  changeColor(id);
+                }
+              }}
+              onMouseUp={() => setIsClicked(false)}
             ></div>
           );
         })}
